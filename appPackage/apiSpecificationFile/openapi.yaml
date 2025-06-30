@@ -1,0 +1,111 @@
+openapi: 3.0.4
+info:
+  title: Post Notification API - Subset
+  description: API for posting meeting notifications by providing meetingId and meetingTime.
+  version: 1.0.0
+servers:
+  - url: https://app-pushnotifdotnet.azurewebsites.net
+paths:
+  /meeting:
+    post:
+      x-openai-isConsequential: false
+      summary: Send meeting details to the notification service
+      operationId: postMeetingDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - meetingId
+                - meetingTime
+              type: object
+              properties:
+                meetingId:
+                  type: string
+                  description: The unique identifier or subject of the meeting.
+                meetingTime:
+                  type: string
+                  description: The scheduled time of the meeting in ISO 8601 format.
+                  format: date-time
+        required: true
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmation message
+  /noneResponse:
+    post:
+      x-openai-isConsequential: false
+      summary: Send meeting details to the noneResponse endpoint
+      operationId: noResponse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - meetingId
+                - meetingTime
+              type: object
+              properties:
+                meetingId:
+                  type: string
+                  description: The unique identifier or subject of the meeting.
+                meetingTime:
+                  type: string
+                  description: The scheduled time of the meeting in ISO 8601 format.
+                  format: date-time
+        required: true
+      responses:
+        '200':
+          description: Request processed successfully (no response body)
+  /MeetingConflict:
+    post:
+      x-openai-isConsequential: false
+      summary: Send details of two meetings to check for conflict
+      operationId: meetingConflict
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - Meeting1
+                - Meeting2
+              properties:
+                Meeting1:
+                  type: object
+                  required:
+                    - MeetingId
+                    - MeetingTime
+                  properties:
+                    MeetingId:
+                      type: string
+                      description: The unique identifier or subject of the first meeting.
+                    MeetingTime:
+                      type: string
+                      format: date-time
+                      description: The scheduled time of the first meeting in ISO 8601 format.
+                Meeting2:
+                  type: object
+                  required:
+                    - MeetingId
+                    - MeetingTime
+                  properties:
+                    MeetingId:
+                      type: string
+                      description: The unique identifier or subject of the second meeting.
+                    MeetingTime:
+                      type: string
+                      format: date-time
+                      description: The scheduled time of the second meeting in ISO 8601 format.
+        required: true
+      responses:
+        '200':
+          description: Conflict check processed successfully
+components: { }

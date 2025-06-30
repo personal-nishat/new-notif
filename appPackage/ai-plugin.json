@@ -1,0 +1,46 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.1/schema.json",
+    "schema_version": "v2.1",
+    "name_for_human": "Post Notification API",
+    "description_for_human": "API for posting meeting notifications by providing meetingId and meetingTime.",
+    "description_for_model": "API for posting meeting notifications by providing meetingId and meetingTime.",
+    "contact_email": "publisher-email@example.com",
+    "namespace": "remindly",
+    "capabilities": {
+        "conversation_starters": [
+            {
+                "text": "Send meeting details to the notification service"
+            }
+        ]
+    },
+    "functions": [
+        {
+            "name": "postMeetingDetails",
+            "description": "Send meeting details to the notification service"
+        },
+        {
+            "name": "noResponse",
+            "description": "Send meeting details to the noneResponse endpoint"
+        },
+        {
+            "name": "meetingConflict",
+            "description": "Send details of two meetings to check for conflict"
+        }
+    ],
+    "runtimes": [
+        {
+            "type": "OpenApi",
+            "auth": {
+                "type": "None"
+            },
+            "spec": {
+                "url": "apiSpecificationFile/openapi.yaml"
+            },
+            "run_for_functions": [
+                "postMeetingDetails",
+                "noResponse",
+                "meetingConflict"
+            ]
+        }
+    ]
+}
