@@ -7,6 +7,9 @@
     "capabilities": [
         {
             "name":"Meetings"
+        },
+        {
+            "name":"Email"
         }
     ],
     "actions": [

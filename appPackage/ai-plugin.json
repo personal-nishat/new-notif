@@ -19,12 +19,12 @@
             "description": "Send meeting details to the notification service"
         },
         {
-            "name": "noResponse",
+            "name": "sendRSVPReminder",
             "description": "Send meeting details to the noneResponse endpoint"
         },
         {
-            "name": "meetingConflict",
-            "description": "Send details of two meetings to check for conflict"
+            "name": "setImportantPeople",
+            "description": "Send important people list"
         }
     ],
     "runtimes": [
@@ -38,8 +38,8 @@
             },
             "run_for_functions": [
                 "postMeetingDetails",
-                "noResponse",
-                "meetingConflict"
+                "sendRSVPReminder",
+                "setImportantPeople"
             ]
         }
     ]

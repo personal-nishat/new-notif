@@ -4,9 +4,9 @@ info:
   description: API for posting meeting notifications by providing meetingId and meetingTime.
   version: 1.0.0
 servers:
-  - url: https://app-pushnotifdotnet.azurewebsites.net
+  - url: https://app-push-notif-prod-b3vufhiqicj7a.azurewebsites.net
 paths:
-  /meeting:
+  /api/Meeting/simple:
     post:
       x-openai-isConsequential: false
       summary: Send meeting details to the notification service
@@ -16,17 +16,45 @@ paths:
           application/json:
             schema:
               required:
-                - meetingId
-                - meetingTime
+                - userEmail
+                - meetings
               type: object
               properties:
-                meetingId:
+                userEmail:
                   type: string
-                  description: The unique identifier or subject of the meeting.
-                meetingTime:
-                  type: string
-                  description: The scheduled time of the meeting in ISO 8601 format.
-                  format: date-time
+                  description: The email address of the user
+                  format: email
+                meetings:
+                  type: array
+                  description: List of meetings to process.
+                  items:
+                    type: object
+                    required:
+                      - meetingId
+                      - meetingStartTime
+                      - meetingEndTime
+                      - attendees
+                    properties:
+                      meetingId:
+                        type: string
+                        description: The unique identifier of the meeting.
+                      meetingStartTime:
+                        type: string
+                        description: The start time of the meeting in ISO 8601 format.
+                        format: date-time
+                      meetingEndTime:
+                        type: string
+                        description: The end time of the meeting in ISO 8601 format.
+                        format: date-time
+                      attendees:
+                        type: array
+                        description: List of meeting attendees.
+                        minItems: 1
+                        maxItems: 5
+                        items:
+                          type: string
+                          description: Email address of the attendee.
+                          format: email
         required: true
       responses:
         '200':
@@ -36,76 +64,102 @@ paths:
               schema:
                 type: object
                 properties:
+                  userEmail:
+                    type: string
+                  appInstancesNotified:
+                    type: array
+                    items:
+                      type: string
+                  totalAppInstances:
+                    type: integer
                   message:
                     type: string
-                    description: Confirmation message
-  /noneResponse:
+        '400':
+          description: Bad request - user not registered or invalid data
+
+  /api/NoneResponse/SendRSVP:
     post:
       x-openai-isConsequential: false
-      summary: Send meeting details to the noneResponse endpoint
-      operationId: noResponse
+      summary: Send RSVP reminder for a meeting
+      operationId: sendRSVPReminder
       requestBody:
         content:
           application/json:
             schema:
               required:
-                - meetingId
-                - meetingTime
+                - userEmail
+                - meetings
               type: object
               properties:
-                meetingId:
+                userEmail:
                   type: string
-                  description: The unique identifier or subject of the meeting.
-                meetingTime:
-                  type: string
-                  description: The scheduled time of the meeting in ISO 8601 format.
-                  format: date-time
+                  description: The email address of the user
+                  format: email
+                meetings:
+                  type: object
+                  description: Meeting details for RSVP reminder.
+                  required:
+                    - meetingId
+                    - meetingStartTime
+                  properties:
+                    meetingId:
+                      type: string
+                      description: The unique identifier of the meeting.
+                    meetingStartTime:
+                      type: string
+                      description: The start time of the meeting in ISO 8601 format.
+                      format: date-time
         required: true
       responses:
         '200':
-          description: Request processed successfully (no response body)
-  /MeetingConflict:
+          description: RSVP reminder sent successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "RSVP reminder sent immediately to user@example.com for meeting meeting123 with Electron support."
+        '500':
+          description: Internal server error
+
+  /api/ImportantPeople:
     post:
       x-openai-isConsequential: false
-      summary: Send details of two meetings to check for conflict
-      operationId: meetingConflict
+      summary: Set important people list
+      operationId: setImportantPeople
       requestBody:
         content:
           application/json:
             schema:
-              type: object
               required:
-                - Meeting1
-                - Meeting2
+                - ImportantPeople
+              type: object
               properties:
-                Meeting1:
-                  type: object
-                  required:
-                    - MeetingId
-                    - MeetingTime
-                  properties:
-                    MeetingId:
-                      type: string
-                      description: The unique identifier or subject of the first meeting.
-                    MeetingTime:
-                      type: string
-                      format: date-time
-                      description: The scheduled time of the first meeting in ISO 8601 format.
-                Meeting2:
-                  type: object
-                  required:
-                    - MeetingId
-                    - MeetingTime
-                  properties:
-                    MeetingId:
-                      type: string
-                      description: The unique identifier or subject of the second meeting.
-                    MeetingTime:
-                      type: string
-                      format: date-time
-                      description: The scheduled time of the second meeting in ISO 8601 format.
+                ImportantPeople:
+                  type: array
+                  description: List of important people (1-5 people).
+                  minItems: 1
+                  maxItems: 5
+                  items:
+                    type: string
+                    description: Email address or name of the important person.
         required: true
       responses:
         '200':
-          description: Conflict check processed successfully
-components: { }
+          description: Important people list updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ImportantPeopleCount:
+                    type: integer
+                  ImportantPeople:
+                    type: array
+                    items:
+                      type: string
+                  Message:
+                    type: string
+        '400':
+          description: Bad request - invalid count (must be 1-5 people)
+
+components: {}
